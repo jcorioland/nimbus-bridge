@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34407.89
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NimbusBridge.Core", "NimbusBridge.Core\NimbusBridge.Core.csproj", "{2EAE45B3-E867-47CD-9AED-001E89E13037}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbusBridge.Azure.EventHubs", "NimbusBridge.Azure.EventHubs\NimbusBridge.Azure.EventHubs.csproj", "{0245F016-E52B-41E1-A602-91B1D183F3FD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbusBridge.Client", "NimbusBridge.Client\NimbusBridge.Client.csproj", "{0B7C188E-7491-4B38-AC9C-EA76AC809F22}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbusBridgeApi", "NimbusBridgeApi\NimbusBridgeApi.csproj", "{940D04FC-9454-41DE-809D-A751930CE146}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2EAE45B3-E867-47CD-9AED-001E89E13037}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EAE45B3-E867-47CD-9AED-001E89E13037}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EAE45B3-E867-47CD-9AED-001E89E13037}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EAE45B3-E867-47CD-9AED-001E89E13037}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0245F016-E52B-41E1-A602-91B1D183F3FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0245F016-E52B-41E1-A602-91B1D183F3FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0245F016-E52B-41E1-A602-91B1D183F3FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0245F016-E52B-41E1-A602-91B1D183F3FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B7C188E-7491-4B38-AC9C-EA76AC809F22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B7C188E-7491-4B38-AC9C-EA76AC809F22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B7C188E-7491-4B38-AC9C-EA76AC809F22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B7C188E-7491-4B38-AC9C-EA76AC809F22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{940D04FC-9454-41DE-809D-A751930CE146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{940D04FC-9454-41DE-809D-A751930CE146}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{940D04FC-9454-41DE-809D-A751930CE146}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{940D04FC-9454-41DE-809D-A751930CE146}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1874EF6F-888E-4BD3-9699-4D4C94E1B97D}
+	EndGlobalSection
+EndGlobal
