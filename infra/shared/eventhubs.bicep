@@ -1,4 +1,5 @@
 param namespaceName string
+param checkpointBlobStoreName string
 param identityPrincipalId string
 param location string = resourceGroup().location
 param tags object = {}
@@ -64,6 +65,25 @@ resource responsesEventHubSendConnectionString 'Microsoft.EventHub/namespaces/ev
   }
 }
 
+resource checkpointBlobStore 'Microsoft.Storage/storageAccounts@2021-02-01' = {
+  name: checkpointBlobStoreName
+  location: location
+  kind: 'StorageV2'
+  sku: {
+    name: 'Premium_LRS'
+  }
+}
+
+resource checkpointBlobService 'Microsoft.Storage/storageAccounts/blobServices@2021-02-01' = {
+  parent: checkpointBlobStore
+  name: 'default'
+}
+
+resource checkpointBlobContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2021-02-01' = {
+  parent: checkpointBlobService
+  name: 'checkpoint'
+}
+
 var commandsEventHubListenConnectionStringValue = listKeys(commandsEventHubListenConnectionString.id, commandsEventHubListenConnectionString.apiVersion).primaryConnectionString
 var responsesEventHubSendConnectionStringValue = listKeys(responsesEventHubSendConnectionString.id, responsesEventHubSendConnectionString.apiVersion).primaryConnectionString
 
@@ -86,3 +106,21 @@ resource responsesSendConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@
     value: responsesEventHubSendConnectionStringValue
   }
 }
+
+resource eventHubsNamespaceFqdnSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  parent: keyVault
+  name: 'EventHubsNamespaceFqdn'
+  properties: {
+    value: '${namespaceName}.servicebus.windows.net'
+  }
+}
+
+resource checkpointBlobContainerUrl 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  parent: keyVault
+  name: 'CheckpointBlobContainerUrl'
+  properties: {
+    value: 'https://${checkpointBlobStoreName}.blob.core.windows.net/checkpoint'
+  }
+}
+
+output namespaceName string = eventHubsNamespace.name

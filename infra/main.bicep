@@ -73,6 +73,7 @@ module keyVault './shared/keyvault.bicep' = {
     tags: tags
     name: '${abbrs.keyVaultVaults}${resourceToken}'
     principalId: principalId
+    containerIdentityId: nimbusBridgeApi.outputs.identityPrincipalId
   }
   scope: rg
 }
@@ -113,6 +114,7 @@ module eventHubs './shared/eventhubs.bicep' = {
     namespaceName: '${abbrs.eventHubNamespaces}${resourceToken}'
     identityPrincipalId: nimbusBridgeApi.outputs.identityPrincipalId
     keyVaultName: keyVault.outputs.name
+    checkpointBlobStoreName: '${abbrs.storageStorageAccounts}${resourceToken}'
   }
   scope: rg
 }
@@ -120,3 +122,5 @@ module eventHubs './shared/eventhubs.bicep' = {
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = registry.outputs.loginServer
 output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 output AZURE_KEY_VAULT_ENDPOINT string = keyVault.outputs.endpoint
+output EVENT_HUBS_NAMESPACE_NAME string = eventHubs.outputs.namespaceName
+output NIMBUS_BRIDGE_USER_ASSIGNED_IDENTITY_ID string = nimbusBridgeApi.outputs.identityClientId

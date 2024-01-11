@@ -5,9 +5,17 @@ param tags object = {}
 @description('Service principal that should be granted read access to the KeyVault. If unset, no service principal is granted access by default')
 param principalId string = ''
 
+@description('App container identity that should be granted read access to the KeyVault.')
+param containerIdentityId string = ''
+
 var defaultAccessPolicies = !empty(principalId) ? [
   {
     objectId: principalId
+    permissions: { secrets: [ 'get', 'list' ] }
+    tenantId: subscription().tenantId
+  }
+  {
+    objectId: containerIdentityId
     permissions: { secrets: [ 'get', 'list' ] }
     tenantId: subscription().tenantId
   }

@@ -126,3 +126,4 @@ output name string = app.name
 output uri string = 'https://${app.properties.configuration.ingress.fqdn}'
 output id string = app.id
 output identityPrincipalId string = identity.properties.principalId
+output identityClientId string = identity.properties.clientId
