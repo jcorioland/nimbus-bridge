@@ -1,4 +1,6 @@
-﻿namespace NimbusBridge.Core.Models;
+﻿using System.Text.Json;
+
+namespace NimbusBridge.Core.Models;
 
 /// <summary>
 /// Defines the broker command.
@@ -20,4 +22,13 @@ public class BrokerCommand : BrokerCommandResponseBase
     /// Gets or sets the name of the command.
     /// </summary>
     public string CommandName { get; set; }
+
+    /// <summary>
+    /// Returns the JSON representation of the command.
+    /// </summary>
+    /// <returns>The JSON representation of the command.</returns>
+    public string GetJson()
+    {
+        return JsonSerializer.Serialize(this);
+    }
 }

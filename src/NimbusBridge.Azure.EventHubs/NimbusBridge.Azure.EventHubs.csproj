@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.10.4" />
+    <PackageReference Include="Azure.Messaging.EventHubs" Version="5.10.0" />
+    <PackageReference Include="Azure.Messaging.EventHubs.Processor" Version="5.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\NimbusBridge.Core\NimbusBridge.Core.csproj" />
   </ItemGroup>
 

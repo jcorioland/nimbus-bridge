@@ -3,9 +3,9 @@ using NimbusBridge.Core.Services;
 
 namespace NimbusBridge.Azure.EventHubs.Services;
 
-public class ClientBrokerService : IClientBrokerService
+public class EventHubsClientBrokerService : IClientBrokerService
 {
-    public Task<BrokerResponse<TResponse>> HandleCommandAsync<TResponse>(BrokerCommand command, CancellationToken cancellationToken) where TResponse : class, new()
+    public Task<BrokerResponseBase> HandleCommandAsync(BrokerCommand command, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }
