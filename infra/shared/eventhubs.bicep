@@ -70,7 +70,18 @@ resource checkpointBlobStore 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   location: location
   kind: 'StorageV2'
   sku: {
-    name: 'Premium_LRS'
+    name: 'Standard_LRS'
+  }
+}
+
+resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  scope: checkpointBlobStore
+  name: guid(subscription().id, resourceGroup().id, identityPrincipalId, 'storageBlobDataContributor')
+  properties: {
+    roleDefinitionId:  subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
+    principalType: 'ServicePrincipal'
+    principalId: identityPrincipalId
   }
 }
 
@@ -124,3 +135,4 @@ resource checkpointBlobContainerUrl 'Microsoft.KeyVault/vaults/secrets@2022-07-0
 }
 
 output namespaceName string = eventHubsNamespace.name
+output checkpointStorageAccountName string = checkpointBlobStore.name

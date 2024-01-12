@@ -123,4 +123,5 @@ output AZURE_CONTAINER_REGISTRY_ENDPOINT string = registry.outputs.loginServer
 output AZURE_KEY_VAULT_NAME string = keyVault.outputs.name
 output AZURE_KEY_VAULT_ENDPOINT string = keyVault.outputs.endpoint
 output EVENT_HUBS_NAMESPACE_NAME string = eventHubs.outputs.namespaceName
+output EVENT_HUBS_CHECKPOINT_STORAGE_ACCOUNT_NAME string = eventHubs.outputs.checkpointStorageAccountName
 output NIMBUS_BRIDGE_USER_ASSIGNED_IDENTITY_ID string = nimbusBridgeApi.outputs.identityClientId
