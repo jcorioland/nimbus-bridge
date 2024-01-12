@@ -27,3 +27,21 @@ Then, run the following commands to get the project on your local environment:
 
 > **Note**<br>
 > If you want to deploy only the infrastructure and not deploy the application, run `azd provision` instead of `azd up`.
+
+#### Run the NimbusBridge client application
+
+Before running the NimbusBridge client application you need to update the [appsettings.json](./src/NimbusBridge.Client/appsettings.json) file with the following values:
+
+- `NIMBUS_BRIDGE_CHECKPOINT_BLOB_CONTAINER_URL` - The URL of the EventHubs checkpointing storage container
+- `NIMBUS_BRIDGE_EVENTHUBS_NAMESPACE_FQDN` - The fully qualified domain name of the EventHubs namespace
+
+Both values can be found in the `.env` file that has been generated after the `azd up` command.
+
+Then, run the following commands to run the client application:
+
+   1. Run `cd src/NimbusBridge.Client`
+   1. Run `dotnet run`
+
+#### Call the Nimbus Bridge API
+
+Now that both API and client are running, you can call the API to check that everything works correctly. The endpoint of the API is available at the end of the output of the `azd up` command. The only implemented API is `/weatherforecast`.
