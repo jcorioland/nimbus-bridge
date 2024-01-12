@@ -68,11 +68,6 @@ namespace NimbusBridgeApi
 
             app.UseAuthorization();
 
-            var summaries = new[]
-            {
-                "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-            };
-
             const string SampleTenantId = "55CDA25F-2555-4E53-B06C-8B61D1C45C79";
             app.MapGet("/weatherforecast", async (HttpContext httpContext, IServerBrokerService serverBrokerService) =>
             {

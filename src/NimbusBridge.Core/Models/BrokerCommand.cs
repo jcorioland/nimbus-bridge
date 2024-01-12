@@ -1,10 +1,12 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace NimbusBridge.Core.Models;
 
 /// <summary>
 /// Defines the broker command.
 /// </summary>
+[JsonSerializable(typeof(BrokerCommand))]
 public class BrokerCommand : BrokerCommandResponseBase
 {
     /// <summary>
@@ -22,13 +24,4 @@ public class BrokerCommand : BrokerCommandResponseBase
     /// Gets or sets the name of the command.
     /// </summary>
     public string CommandName { get; set; }
-
-    /// <summary>
-    /// Returns the JSON representation of the command.
-    /// </summary>
-    /// <returns>The JSON representation of the command.</returns>
-    public string GetJson()
-    {
-        return JsonSerializer.Serialize(this);
-    }
 }

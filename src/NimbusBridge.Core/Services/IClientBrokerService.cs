@@ -15,10 +15,15 @@ public interface IClientBrokerService
     Task StartListeningAsync(CancellationToken cancellationToken);
 
     /// <summary>
-    /// Handles a broker command on the client side and returns the response.
+    /// Raised when a command has been received from the broker.
     /// </summary>
-    /// <param name="command">The command to be handled.</param>
-    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-    /// <returns>A broker response that contains the results of the command.</returns>
-    Task<BrokerResponseBase> HandleCommandAsync(BrokerCommand command, CancellationToken cancellationToken);
+    event Func<BrokerCommand, Task>? CommandReceivedAsync;
+
+    /// <summary>
+    /// Sends a response to the broker.
+    /// </summary>
+    /// <param name="response">The response to send.</param>
+    /// <param name="cancellationToken">A cancellation token that allows to cancel the operation.</param>
+    /// <returns>A task that can be awaited until the response has been sent</returns>
+    Task SendResponseAsync(BrokerResponseBase response, CancellationToken cancellationToken);
 }

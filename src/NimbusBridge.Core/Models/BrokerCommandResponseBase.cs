@@ -1,4 +1,7 @@
-﻿namespace NimbusBridge.Core.Models;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace NimbusBridge.Core.Models;
 
 /// <summary>
 /// Defines the base class for broker commands and responses.

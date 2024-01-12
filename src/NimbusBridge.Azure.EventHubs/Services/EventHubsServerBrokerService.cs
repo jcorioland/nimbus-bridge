@@ -1,5 +1,4 @@
 ﻿using Azure.Core;
-using Azure.Identity;
 using Azure.Messaging.EventHubs;
 using Azure.Messaging.EventHubs.Consumer;
 using Azure.Messaging.EventHubs.Processor;
@@ -8,7 +7,6 @@ using Azure.Storage.Blobs;
 using NimbusBridge.Core.Models;
 using NimbusBridge.Core.Services;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -63,8 +61,10 @@ public class EventHubsServerBrokerService : IServerBrokerService
             throw new InvalidOperationException("A callback for the given correlation id already exists.");
         }
 
+        var jsonCommand = JsonSerializer.Serialize(command);
+
         var dataBatch = await _commandsEventHubProducerClient.CreateBatchAsync(cancellationToken);
-        dataBatch.TryAdd(new EventData(Encoding.UTF8.GetBytes(command.GetJson())));
+        dataBatch.TryAdd(new EventData(Encoding.UTF8.GetBytes(jsonCommand)));
 
         await _commandsEventHubProducerClient.SendAsync(dataBatch, cancellationToken);
         return await tcs.Task;
@@ -73,33 +73,50 @@ public class EventHubsServerBrokerService : IServerBrokerService
     public async Task StartListeningAsync(CancellationToken cancellationToken)
     {
         _responsesEventProcessorClient.ProcessEventAsync += OnProcessEventAsync;
+        _responsesEventProcessorClient.ProcessErrorAsync += ProcessErrorAsync;
         await _responsesEventProcessorClient.StartProcessingAsync(cancellationToken);
     }
 
-    private Task OnProcessEventAsync(ProcessEventArgs args)
+    private Task ProcessErrorAsync(ProcessErrorEventArgs args)
     {
-        var jsonResponse = Encoding.UTF8.GetString(args.Data.Body.ToArray());
-        var brokeredResponse = JsonSerializer.Deserialize<BrokerResponseBase>(jsonResponse);
-
-        if (brokeredResponse == null)
-        {
-            return Task.CompletedTask;
-        }
-
-        if (!string.IsNullOrEmpty(brokeredResponse.CorrelationId))
-        {
-            TaskCompletionSource<BrokerResponseBase>? tcs;
-            if (_callbacks.TryGetValue(brokeredResponse.CorrelationId, out tcs))
-            {
-                tcs.SetResult(brokeredResponse);
-                _callbacks.Remove(brokeredResponse.CorrelationId, out _);
-            }
-            else
-            {
-                // todo: log
-            }
-        }
-
+        Console.WriteLine(args.Exception.Message);
         return Task.CompletedTask;
+    }
+
+    private async Task OnProcessEventAsync(ProcessEventArgs args)
+    {
+        try
+        {
+            if(args.Data == null)
+            {
+                return;
+            }
+
+            var jsonResponse = Encoding.UTF8.GetString(args.Data.Body.ToArray());
+            var brokeredResponse = JsonSerializer.Deserialize<GetWeatherForecastResponse>(jsonResponse);
+
+            if (brokeredResponse == null)
+            {
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(brokeredResponse.CorrelationId))
+            {
+                TaskCompletionSource<BrokerResponseBase>? tcs;
+                if (_callbacks.TryGetValue(brokeredResponse.CorrelationId, out tcs))
+                {
+                    tcs.SetResult(brokeredResponse);
+                    _callbacks.Remove(brokeredResponse.CorrelationId, out _);
+                }
+                else
+                {
+                    // todo: log
+                }
+            }
+        }
+        finally
+        {
+            await args.UpdateCheckpointAsync();
+        }
     }
 }

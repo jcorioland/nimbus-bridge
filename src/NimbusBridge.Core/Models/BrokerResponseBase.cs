@@ -1,5 +1,8 @@
-﻿namespace NimbusBridge.Core.Models;
+﻿using System.Text.Json.Serialization;
 
+namespace NimbusBridge.Core.Models;
+
+[JsonDerivedType(typeof(GetWeatherForecastResponse))]
 public abstract class BrokerResponseBase : BrokerCommandResponseBase
 {
     public BrokerResponseBase()
