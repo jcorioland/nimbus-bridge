@@ -14,7 +14,7 @@ Install the following prerequisites:
 - [.NET 8](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Visual Studio Code](https://code.visualstudio.com/download) or [Visual Studio 2022](https://visualstudio.microsoft.com/downloads/)
 - [Git](https://git-scm.com/downloads)
-- [Powershell 7+ (pwsh)](https://github.com/powershell/powershell) - For Windows users only.
+- [Powershell 7+ (pwsh)](https://github.com/powershell/powershell) - For Windows users only, optional if you use VS 2022, then Developer Command Prompt for VS2022 is enough.
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
    > **Important**<br>
