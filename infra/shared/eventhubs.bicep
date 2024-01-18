@@ -16,8 +16,17 @@ resource eventHubsNamespace 'Microsoft.EventHub/namespaces@2021-11-01' = {
   }
 }
 
-resource commandsEventHub 'Microsoft.EventHub/namespaces/eventhubs@2021-11-01' = {
-  name: 'commands'
+resource adventureWorksCommandsEventHub 'Microsoft.EventHub/namespaces/eventhubs@2021-11-01' = {
+  name: 'adventureworks-commands'
+  parent: eventHubsNamespace
+  properties: {
+    messageRetentionInDays: 1
+    partitionCount: 4
+  }
+}
+
+resource contosoCommandsEventHub 'Microsoft.EventHub/namespaces/eventhubs@2021-11-01' = {
+  name: 'contoso-commands'
   parent: eventHubsNamespace
   properties: {
     messageRetentionInDays: 1
@@ -45,9 +54,19 @@ resource eventHubsDataOwner 'Microsoft.Authorization/roleAssignments@2022-04-01'
   }
 }
 
-resource commandsEventHubListenConnectionString 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2021-11-01' = {
-  parent: commandsEventHub
-  name: 'ListenCommandsHub'
+resource contosoCommandsEventHubListenConnectionString 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2021-11-01' = {
+  parent: contosoCommandsEventHub
+  name: 'ContosoListenCommandsHub'
+  properties: {
+    rights: [
+      'Listen'
+    ]
+  }
+}
+
+resource adventureWorksCommandsEventHubListenConnectionString 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2021-11-01' = {
+  parent: adventureWorksCommandsEventHub
+  name: 'AdventureWorksListenCommandsHub'
   properties: {
     rights: [
       'Listen'
@@ -95,18 +114,27 @@ resource checkpointBlobContainer 'Microsoft.Storage/storageAccounts/blobServices
   name: 'checkpoint'
 }
 
-var commandsEventHubListenConnectionStringValue = listKeys(commandsEventHubListenConnectionString.id, commandsEventHubListenConnectionString.apiVersion).primaryConnectionString
+var contosoCommandsEventHubListenConnectionStringValue = listKeys(contosoCommandsEventHubListenConnectionString.id, contosoCommandsEventHubListenConnectionString.apiVersion).primaryConnectionString
+var adventureWorksCommandsEventHubListenConnectionStringValue = listKeys(adventureWorksCommandsEventHubListenConnectionString.id, adventureWorksCommandsEventHubListenConnectionString.apiVersion).primaryConnectionString
 var responsesEventHubSendConnectionStringValue = listKeys(responsesEventHubSendConnectionString.id, responsesEventHubSendConnectionString.apiVersion).primaryConnectionString
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
   name: keyVaultName
 }
 
-resource commandsListenConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource contosoCommandsListenConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: keyVault
-  name: 'CommandsEventHubListenConnectionString'
+  name: 'ContosoCommandsEventHubListenConnectionString'
   properties: {
-    value: commandsEventHubListenConnectionStringValue
+    value: contosoCommandsEventHubListenConnectionStringValue
+  }
+}
+
+resource adventureWorksCommandsListenConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+  parent: keyVault
+  name: 'AdventureWorksCommandsEventHubListenConnectionString'
+  properties: {
+    value: adventureWorksCommandsEventHubListenConnectionStringValue
   }
 }
 

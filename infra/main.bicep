@@ -125,3 +125,5 @@ output AZURE_KEY_VAULT_ENDPOINT string = keyVault.outputs.endpoint
 output EVENT_HUBS_NAMESPACE_NAME string = eventHubs.outputs.namespaceName
 output EVENT_HUBS_CHECKPOINT_STORAGE_ACCOUNT_NAME string = eventHubs.outputs.checkpointStorageAccountName
 output NIMBUS_BRIDGE_USER_ASSIGNED_IDENTITY_ID string = nimbusBridgeApi.outputs.identityClientId
+output NIMBUS_BRIDGE_CHECKPOINT_BLOB_CONTAINER_URL string = 'https://${eventHubs.outputs.checkpointStorageAccountName}.blob.core.windows.net/checkpoint'
+output NIMBUS_BRIDGE_EVENTHUBS_NAMESPACE_FQDN string = '${eventHubs.outputs.namespaceName}.servicebus.windows.net'
