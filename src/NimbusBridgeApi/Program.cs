@@ -20,8 +20,11 @@ namespace NimbusBridgeApi
                 throw new InvalidOperationException("AZURE_KEY_VAULT_ENDPOINT environment variable is not set");
             }
 
-            TokenCredential azureTokenCredential = new DefaultAzureCredential();
+            // for this sample, we use the Azure CLI credential as we support a flow that uses the Azure Developer CLI to deploy the sample (see README.md)
+            // This is useful if you want to run the NimbusBridgeApi locally from your developer machine
+            TokenCredential azureTokenCredential = new AzureCliCredential();
 
+            // when deployed in the cloud, we are using a user-assigned identity
             var nimbusBridgeUserAssignedIdentityId = Environment.GetEnvironmentVariable("NIMBUS_BRIDGE_USER_ASSIGNED_IDENTITY_ID");
             if (!string.IsNullOrEmpty(nimbusBridgeUserAssignedIdentityId))
             {
@@ -49,8 +52,12 @@ namespace NimbusBridgeApi
                 throw new InvalidOperationException("EventHubsNamespaceFqdn configuration is not set");
             }
 
-            var serverBrokerService = new EventHubsServerBrokerService(checkpointBlobContainerUrl, eventHubsNamespaceFqdn, azureTokenCredential);
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            // in this example, we support two tenants: contoso and adventureworks
+            // in a production use case, the list of tenants would be retrieved from a database and each request / user tenant would be deducted from an authentication token
+            List<string> tenantIdentifiers = ["contoso", "adventureworks"];
+            
+            var serverBrokerService = new EventHubsServerBrokerService(checkpointBlobContainerUrl, eventHubsNamespaceFqdn, azureTokenCredential, tenantIdentifiers);
+            CancellationTokenSource cancellationTokenSource = new();
             Task listeningTask = serverBrokerService.StartListeningAsync(cancellationTokenSource.Token);
 
             builder.Services.AddSingleton<IServerBrokerService>(serverBrokerService);
@@ -68,10 +75,15 @@ namespace NimbusBridgeApi
 
             app.UseAuthorization();
 
-            const string SampleTenantId = "55CDA25F-2555-4E53-B06C-8B61D1C45C79";
             app.MapGet("/weatherforecast", async (HttpContext httpContext, IServerBrokerService serverBrokerService) =>
             {
-                var command = new BrokerCommand(SampleTenantId, "GetWeatherForecast");
+                string tenantId = httpContext.Request.Query["tenantId"].ToString();
+                if(string.IsNullOrEmpty(tenantId))
+                {
+                    throw new HttpRequestException(message: "No tenantId parameter found.", inner: null, statusCode: System.Net.HttpStatusCode.BadRequest);
+                }
+
+                var command = new BrokerCommand(tenantId, "GetWeatherForecast");
                 return await serverBrokerService.SendCommandAsync(command, httpContext.RequestAborted);
             })
             .WithName("GetWeatherForecast")

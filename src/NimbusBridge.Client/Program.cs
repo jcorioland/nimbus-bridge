@@ -5,9 +5,9 @@ using NimbusBridge.Core.Models;
 internal class Program
 {
     private static EventHubsClientBrokerService? clientBrokerService;
-    private static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1,1);
+    private static readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
-    private static async Task Main(string[] args)
+    private static async Task Main()
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -34,7 +34,16 @@ internal class Program
             cts.Cancel();
         };
 
-        clientBrokerService = new EventHubsClientBrokerService(checkpointStoreBlobContainerUrl, eventHubsNamespaceFqdn);
+        Console.WriteLine("Please enter the name of the tenant to simulate (contoso or adventureworks)");
+        string tenantName = Console.ReadLine() ?? string.Empty;
+
+        if(tenantName != "contoso" && tenantName != "adventureworks")
+        {
+            tenantName = "contoso";
+            Console.WriteLine("The tenant name is invalid. The tenant name has been set to contoso.");
+        }
+
+        clientBrokerService = new EventHubsClientBrokerService(checkpointStoreBlobContainerUrl, eventHubsNamespaceFqdn, tenantName);
         clientBrokerService.CommandReceivedAsync += OnCommandReceivedAsync;
         await clientBrokerService.StartListeningAsync(cts.Token);
     }

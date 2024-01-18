@@ -2,7 +2,6 @@
 
 namespace NimbusBridge.Core.Models;
 
-[JsonSerializable(typeof(GetWeatherForecastResponse))]
 public class GetWeatherForecastResponse : BrokerResponseBase
 {
     public GetWeatherForecastResponse()

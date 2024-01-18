@@ -5,11 +5,11 @@ VisualStudioVersion = 17.9.34407.89
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NimbusBridge.Core", "NimbusBridge.Core\NimbusBridge.Core.csproj", "{2EAE45B3-E867-47CD-9AED-001E89E13037}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbusBridge.Azure.EventHubs", "NimbusBridge.Azure.EventHubs\NimbusBridge.Azure.EventHubs.csproj", "{0245F016-E52B-41E1-A602-91B1D183F3FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NimbusBridge.Azure.EventHubs", "NimbusBridge.Azure.EventHubs\NimbusBridge.Azure.EventHubs.csproj", "{0245F016-E52B-41E1-A602-91B1D183F3FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbusBridge.Client", "NimbusBridge.Client\NimbusBridge.Client.csproj", "{0B7C188E-7491-4B38-AC9C-EA76AC809F22}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NimbusBridge.Client", "NimbusBridge.Client\NimbusBridge.Client.csproj", "{0B7C188E-7491-4B38-AC9C-EA76AC809F22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NimbusBridgeApi", "NimbusBridgeApi\NimbusBridgeApi.csproj", "{940D04FC-9454-41DE-809D-A751930CE146}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NimbusBridgeApi", "NimbusBridgeApi\NimbusBridgeApi.csproj", "{940D04FC-9454-41DE-809D-A751930CE146}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

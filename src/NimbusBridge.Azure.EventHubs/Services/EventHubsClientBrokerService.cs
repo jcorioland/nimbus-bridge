@@ -21,25 +21,34 @@ public class EventHubsClientBrokerService : IClientBrokerService
     private const string ResponsesEventHubName = "responses";
     private readonly EventProcessorClient _commandsEventProcessorClient;
     private readonly EventHubProducerClient _responsesEventHubProducerClient;
+    private readonly string _tenantName;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHubsClientBrokerService"/> class.
     /// </summary>
     /// <param name="checkpointStoreBlobContainerUrl">The url of the blob container that is used for EventHubs checkpointing.</param>
     /// <param name="eventHubsNamespaceFqdn">The fqdn of the EventHubs namespace used to exchange commands and responses messages.</param>
-    public EventHubsClientBrokerService(string checkpointStoreBlobContainerUrl, string eventHubsNamespaceFqdn)
+    /// <param name="tenantName">The name of the tenant.</param>
+    public EventHubsClientBrokerService(string checkpointStoreBlobContainerUrl, string eventHubsNamespaceFqdn, string tenantName)
     {
         ArgumentNullException.ThrowIfNull(checkpointStoreBlobContainerUrl, nameof(checkpointStoreBlobContainerUrl));
         ArgumentNullException.ThrowIfNull(eventHubsNamespaceFqdn, nameof(eventHubsNamespaceFqdn));
-        
-        var tokenCredential = new DefaultAzureCredential();
+        ArgumentNullException.ThrowIfNull(tenantName, nameof(tenantName));
+
+        // for this sample, we use the Azure CLI credential as we support a flow that uses the Azure Developer CLI to deploy the sample (see README.md)
+        // it assumes this sample NimbusBridge client will be run locally from your developer machine
+        // if you need to change this behavior, you can use any of the Azure.Identity credential types (see https://docs.microsoft.com/en-us/dotnet/api/overview/azure/identity-readme#defaultazurecredential)
+        var tokenCredential = new AzureCliCredential();
         var checkpointStore = new BlobContainerClient(new Uri(checkpointStoreBlobContainerUrl), tokenCredential);
 
+        _tenantName = tenantName;
+
+        string tenantCommandsHubName = $"{tenantName}-{CommandsEventHubName}";
         _commandsEventProcessorClient = new EventProcessorClient(
             checkpointStore,
             EventHubConsumerClient.DefaultConsumerGroupName,
             eventHubsNamespaceFqdn,
-            CommandsEventHubName,
+            tenantCommandsHubName,
             tokenCredential
         );
 
@@ -65,7 +74,7 @@ public class EventHubsClientBrokerService : IClientBrokerService
         _commandsEventProcessorClient.ProcessEventAsync += ProcessCommandEventAsync;
         _commandsEventProcessorClient.ProcessErrorAsync += ProcessErrorAsync;
         await _commandsEventProcessorClient.StartProcessingAsync(cancellationToken);
-        Console.WriteLine("Started listening to the broker for commands.");
+        Console.WriteLine($"Started listening to the broker for commands on {_tenantName}-commands hub.");
         await Task.Delay(Timeout.Infinite, cancellationToken);
     }
 
@@ -86,7 +95,7 @@ public class EventHubsClientBrokerService : IClientBrokerService
 
     private async Task ProcessCommandEventAsync(ProcessEventArgs args)
     {
-        Console.WriteLine("Received a new command.");
+        Console.WriteLine($"Received a new command on {_tenantName}-commands hub.");
         try
         {
             if (args.Data == null)
@@ -94,13 +103,8 @@ public class EventHubsClientBrokerService : IClientBrokerService
                 return;
             }
 
-            var jsonResponse = Encoding.UTF8.GetString(args.Data.Body.ToArray());
-            var command = JsonSerializer.Deserialize<BrokerCommand>(jsonResponse);
-            if (command == null)
-            {
-                throw new InvalidOperationException("Cannot deserialize the brokered command.");
-            }
-
+            var jsonCommand = Encoding.UTF8.GetString(args.Data.Body.ToArray());
+            var command = JsonSerializer.Deserialize<BrokerCommand>(jsonCommand) ?? throw new InvalidOperationException("Cannot deserialize the brokered command.");
             CommandReceivedAsync?.Invoke(command);
         }
         finally

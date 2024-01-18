@@ -20,7 +20,7 @@ public abstract class BrokerCommandResponseBase
     /// <summary>
     /// Defines a constructor for broker commands and responses.
     /// </summary>
-    /// <param name="correlationId">The correlation id that helps to correlate commands and responses.</param>
+    /// <param name="correlationId">The correlation id that helps to correlate commands and responses and ensure that a client cannot send random response to any tenant.</param>
     /// <param name="tenantId">The unique identifier of the tenant</param>
     public BrokerCommandResponseBase(string correlationId, string tenantId)
     {
@@ -40,6 +40,8 @@ public abstract class BrokerCommandResponseBase
 
     /// <summary>
     /// The correlation id that helps to correlate commands and responses.
+    /// It's important that this correlation id is unique and used only to correlate the command and its response, and also
+    /// that is not possible for a client to send random response to any tenant.
     /// </summary>
     public string CorrelationId { get; set; }
 
