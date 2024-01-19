@@ -59,23 +59,25 @@ internal class Program
 
         if (command.CommandName == "GetWeatherForecast")
         {
-            // TODO: move this into another project / executable to simulate the legacy software.
             Console.WriteLine("Sending response to command GetWeatherForecast.");
-            var summaries = new[]
+            
+            // here we are running on the NimbusBridge client side, i.e. on premise.
+            // this client is able to use a legacy SDK to retrieve the weather forecast from the NimbusBridge legacy software service.
+            // we can imagine various scenarios where the legacy software service uses different transports or protocols, like http, RPC, inter-process communication, etc.
+            var weatherForecastLegacyService = new NimbusBridge.LegacySdk.WeatherForecastService();
+            var weatherForecast = weatherForecastLegacyService.GetWeatherForecast(DateOnly.FromDateTime(DateTime.UtcNow));
+            var response = new GetWeatherForecastResponse(command.CorrelationId, command.TenantId)
             {
-                "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-            };
-
-            var response = new GetWeatherForecastResponse(command)
-            {
-                Summary = summaries[new Random().Next(summaries.Length)],
-                Date = DateOnly.FromDateTime(DateTime.UtcNow),
-                TemperatureC = new Random().Next(-10, 10)
+                Date = weatherForecast.Date,
+                TemperatureC = weatherForecast.TemperatureC,
+                TemperatureF = weatherForecast.TemperatureF,
+                Summary = weatherForecast.Summary
             };
 
             await semaphoreSlim.WaitAsync();
             try
             {
+                // send the response to the broker
                 await clientBrokerService.SendResponseAsync(response, CancellationToken.None);
             }
             finally

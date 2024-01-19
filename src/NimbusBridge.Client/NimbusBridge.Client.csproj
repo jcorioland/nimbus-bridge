@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\NimbusBridge.Azure.EventHubs\NimbusBridge.Azure.EventHubs.csproj" />
     <ProjectReference Include="..\NimbusBridge.Core\NimbusBridge.Core.csproj" />
+    <ProjectReference Include="..\NimbusBridge.LegacySdk\NimbusBridge.LegacySdk.csproj" />
   </ItemGroup>
 
 </Project>
