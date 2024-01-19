@@ -3,6 +3,10 @@
 NimbusBridge is an architectural guidance that aim to simplify the integration of legacy software with the Azure Cloud. You can read more about this architecture guidance in this [blog post](TODO ISE DevBlog URL). 
 This repository contains a reference implementation of the NimbusBridge architecture, using C# and .NET 8.
 
+It simulates the following architecture / flow:
+
+![Architecture](./assets/img/architecture-big-picture.png)
+
 ## Getting Started
 
 ### Local environment
