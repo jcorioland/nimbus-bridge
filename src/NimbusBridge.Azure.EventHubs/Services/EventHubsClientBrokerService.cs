@@ -9,19 +9,22 @@ using Azure.Messaging.EventHubs.Processor;
 using System.Text;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
+using NimbusBridge.Azure.EventHubs.Models;
+using System.Collections.Concurrent;
 
 namespace NimbusBridge.Azure.EventHubs.Services;
 
 /// <summary>
 /// Defines an implementation of <see cref="IClientBrokerService"/> that uses Azure Event Hubs as the underlying transport."/>
 /// </summary>
-public class EventHubsClientBrokerService : IClientBrokerService
+public class EventHubsClientBrokerService : IClientBrokerService<EventHubsBrokerCommand>
 {
     private const string CommandsEventHubName = "commands";
     private const string ResponsesEventHubName = "responses";
     private readonly EventProcessorClient _commandsEventProcessorClient;
     private readonly EventHubProducerClient _responsesEventHubProducerClient;
     private readonly string _tenantName;
+    private readonly ConcurrentDictionary<string, List<string>> _responsePartitions = new ConcurrentDictionary<string, List<string>>();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHubsClientBrokerService"/> class.
@@ -62,7 +65,7 @@ public class EventHubsClientBrokerService : IClientBrokerService
     /// <summary>
     /// Raised when a command has been received from the broker.
     /// </summary>
-    public event Func<BrokerCommand, Task>? CommandReceivedAsync;
+    public event Func<EventHubsBrokerCommand, Task>? CommandReceivedAsync;
 
     /// <summary>
     /// Starts listening to the broker for commands.
@@ -86,7 +89,17 @@ public class EventHubsClientBrokerService : IClientBrokerService
     /// <returns>A task that can be awaited until the response has been sent</returns>
     public async Task SendResponseAsync(BrokerResponseBase response, CancellationToken cancellationToken)
     {
-        var dataBatch = await _responsesEventHubProducerClient.CreateBatchAsync(cancellationToken);
+        if (!_responsePartitions.TryGetValue(response.CorrelationId, out var partitions) || !partitions.Any())
+        {
+            throw new InvalidOperationException($"Unable to retrieve the list of partitions to send the response to for correlation id {response.CorrelationId}.");
+        }
+
+        var createBatchOptions = new CreateBatchOptions
+        {
+            PartitionId = partitions.First()
+        };
+
+        var dataBatch = await _responsesEventHubProducerClient.CreateBatchAsync(createBatchOptions, cancellationToken);
         string json = JsonSerializer.Serialize(response);
         dataBatch.TryAdd(new EventData(Encoding.UTF8.GetBytes(json)));
 
@@ -104,7 +117,8 @@ public class EventHubsClientBrokerService : IClientBrokerService
             }
 
             var jsonCommand = Encoding.UTF8.GetString(args.Data.Body.ToArray());
-            var command = JsonSerializer.Deserialize<BrokerCommand>(jsonCommand) ?? throw new InvalidOperationException("Cannot deserialize the brokered command.");
+            var command = JsonSerializer.Deserialize<EventHubsBrokerCommand>(jsonCommand) ?? throw new InvalidOperationException("Cannot deserialize the brokered command.");
+            _responsePartitions.TryAdd(command.CorrelationId, command.Partitions);
             CommandReceivedAsync?.Invoke(command);
         }
         finally

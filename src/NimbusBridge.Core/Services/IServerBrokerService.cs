@@ -2,8 +2,8 @@
 
 namespace NimbusBridge.Core.Services;
 
-public interface IServerBrokerService
+public interface IServerBrokerService<TCommand> where TCommand : BrokerCommand
 {
     Task StartListeningAsync(CancellationToken cancellationToken);
-    Task<BrokerResponseBase> SendCommandAsync(BrokerCommand command, CancellationToken cancellationToken);
+    Task<TResponse> SendCommandAsync<TResponse>(TCommand command, CancellationToken cancellationToken) where TResponse: BrokerResponseBase;
 }

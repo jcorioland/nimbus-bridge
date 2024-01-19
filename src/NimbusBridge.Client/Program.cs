@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using NimbusBridge.Azure.EventHubs.Models;
 using NimbusBridge.Azure.EventHubs.Services;
 using NimbusBridge.Core.Models;
 
@@ -48,7 +49,7 @@ internal class Program
         await clientBrokerService.StartListeningAsync(cts.Token);
     }
 
-    private static async Task OnCommandReceivedAsync(BrokerCommand command)
+    private static async Task OnCommandReceivedAsync(EventHubsBrokerCommand command)
     {
         Console.WriteLine("New command received.");
         if(clientBrokerService == null)
@@ -58,6 +59,7 @@ internal class Program
 
         if (command.CommandName == "GetWeatherForecast")
         {
+            // TODO: move this into another project / executable to simulate the legacy software.
             Console.WriteLine("Sending response to command GetWeatherForecast.");
             var summaries = new[]
             {

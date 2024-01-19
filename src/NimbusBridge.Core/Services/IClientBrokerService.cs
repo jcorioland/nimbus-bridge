@@ -5,7 +5,7 @@ namespace NimbusBridge.Core.Services;
 /// <summary>
 /// Defines an interface for the client broker service.
 /// </summary>
-public interface IClientBrokerService
+public interface IClientBrokerService<TCommand> where TCommand: BrokerCommand
 {
     /// <summary>
     /// Starts listening to the broker for commands.
@@ -17,7 +17,7 @@ public interface IClientBrokerService
     /// <summary>
     /// Raised when a command has been received from the broker.
     /// </summary>
-    event Func<BrokerCommand, Task>? CommandReceivedAsync;
+    event Func<TCommand, Task>? CommandReceivedAsync;
 
     /// <summary>
     /// Sends a response to the broker.

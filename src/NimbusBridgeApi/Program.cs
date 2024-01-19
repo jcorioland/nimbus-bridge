@@ -1,6 +1,7 @@
 
 using Azure.Core;
 using Azure.Identity;
+using NimbusBridge.Azure.EventHubs.Models;
 using NimbusBridge.Azure.EventHubs.Services;
 using NimbusBridge.Core.Models;
 using NimbusBridge.Core.Services;
@@ -60,7 +61,7 @@ namespace NimbusBridgeApi
             CancellationTokenSource cancellationTokenSource = new();
             Task listeningTask = serverBrokerService.StartListeningAsync(cancellationTokenSource.Token);
 
-            builder.Services.AddSingleton<IServerBrokerService>(serverBrokerService);
+            builder.Services.AddSingleton<IServerBrokerService<EventHubsBrokerCommand>>(serverBrokerService);
 
             var app = builder.Build();
 
@@ -75,7 +76,7 @@ namespace NimbusBridgeApi
 
             app.UseAuthorization();
 
-            app.MapGet("/weatherforecast", async (HttpContext httpContext, IServerBrokerService serverBrokerService) =>
+            app.MapGet("/weatherforecast", async (HttpContext httpContext, IServerBrokerService<EventHubsBrokerCommand> serverBrokerService) =>
             {
                 string tenantId = httpContext.Request.Query["tenantId"].ToString();
                 if(string.IsNullOrEmpty(tenantId))
@@ -83,8 +84,8 @@ namespace NimbusBridgeApi
                     throw new HttpRequestException(message: "No tenantId parameter found.", inner: null, statusCode: System.Net.HttpStatusCode.BadRequest);
                 }
 
-                var command = new BrokerCommand(tenantId, "GetWeatherForecast");
-                return await serverBrokerService.SendCommandAsync(command, httpContext.RequestAborted);
+                var command = new EventHubsBrokerCommand(tenantId, "GetWeatherForecast");
+                return await serverBrokerService.SendCommandAsync<GetWeatherForecastResponse>(command, httpContext.RequestAborted);
             })
             .WithName("GetWeatherForecast")
             .WithOpenApi();

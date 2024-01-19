@@ -4,6 +4,7 @@ using Azure.Messaging.EventHubs.Consumer;
 using Azure.Messaging.EventHubs.Processor;
 using Azure.Messaging.EventHubs.Producer;
 using Azure.Storage.Blobs;
+using NimbusBridge.Azure.EventHubs.Models;
 using NimbusBridge.Core.Models;
 using NimbusBridge.Core.Services;
 using System.Collections.Concurrent;
@@ -15,13 +16,14 @@ namespace NimbusBridge.Azure.EventHubs.Services;
 /// <summary>
 /// Defines an implementation of <see cref="IServerBrokerService"/> that uses Azure Event Hubs as the underlying transport."/>
 /// </summary>
-public class EventHubsServerBrokerService : IServerBrokerService
+public class EventHubsServerBrokerService : IServerBrokerService<EventHubsBrokerCommand>
 {
     private const string CommandsEventHubName = "commands";
     private const string ResponsesEventHubName = "responses";
     private readonly EventProcessorClient _responsesEventProcessorClient;
     private readonly ConcurrentDictionary<string, TaskCompletionSource<BrokerResponseBase>> _callbacks;
     private readonly ConcurrentDictionary<string, EventHubProducerClient> _producers;
+    private readonly HashSet<string> _partitions = new HashSet<string>();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="EventHubsServerBrokerService"/> class.
@@ -78,7 +80,7 @@ public class EventHubsServerBrokerService : IServerBrokerService
     /// <param name="command">The command to send.</param>
     /// <param name="cancellationToken">A cancellation token that allows to interrupt the operation.</param>
     /// <exception cref="InvalidOperationException">If the callback already exists for the same command correlation id or if no EventHubProducerClient is found for the tenant</exception>
-    public async Task<BrokerResponseBase> SendCommandAsync(BrokerCommand command, CancellationToken cancellationToken)
+    public async Task<TResponse> SendCommandAsync<TResponse>(EventHubsBrokerCommand command, CancellationToken cancellationToken) where TResponse : BrokerResponseBase
     {
         // create a task completion source that will be used to put the http request on hold until the response is received
         var tcs = new TaskCompletionSource<BrokerResponseBase>(cancellationToken);
@@ -86,6 +88,11 @@ public class EventHubsServerBrokerService : IServerBrokerService
         {
             throw new InvalidOperationException("A callback for the given correlation id already exists.");
         }
+
+        // indicate the partitions that can be used to send the response to this command
+        // this is done to ensure that the response will be sent to a partition that is owned by this process / web server
+        // so the http request can be unblocked and the response can be sent back to the client
+        command.Partitions.AddRange(_partitions);
 
         // serialize the command to json
         var jsonCommand = JsonSerializer.Serialize(command);
@@ -106,7 +113,13 @@ public class EventHubsServerBrokerService : IServerBrokerService
         // this is where the http request is put on hold until the response is received
         // the task completion source will be completed in the OnProcessEventAsync method,
         // once a response with the same correlation id is received
-        return await tcs.Task;
+        var brokeredResponse = await tcs.Task as TResponse;
+        if(brokeredResponse == null)
+        {
+            throw new InvalidCastException($"Unexpected response type has been received. Expected: {typeof(TResponse).Name}. Received: {tcs.Task.Result.GetType().Name}.");
+        }
+
+        return brokeredResponse;
     }
 
     /// <summary>
@@ -116,6 +129,24 @@ public class EventHubsServerBrokerService : IServerBrokerService
     /// <returns></returns>
     public async Task StartListeningAsync(CancellationToken cancellationToken)
     {
+        _responsesEventProcessorClient.PartitionInitializingAsync += args =>
+        {
+            if(!_partitions.Contains(args.PartitionId))
+            {
+                _partitions.Add(args.PartitionId);
+            }
+            return Task.CompletedTask;
+        };
+
+        _responsesEventProcessorClient.PartitionClosingAsync += args =>
+        {
+            if(_partitions.Contains(args.PartitionId))
+            {
+                _partitions.Remove(args.PartitionId);
+            }
+            return Task.CompletedTask;
+        };
+
         _responsesEventProcessorClient.ProcessEventAsync += OnProcessEventAsync;
         _responsesEventProcessorClient.ProcessErrorAsync += ProcessErrorAsync;
         await _responsesEventProcessorClient.StartProcessingAsync(cancellationToken);
