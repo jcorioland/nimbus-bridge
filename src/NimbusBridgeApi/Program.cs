@@ -53,9 +53,9 @@ namespace NimbusBridgeApi
                 throw new InvalidOperationException("EventHubsNamespaceFqdn configuration is not set");
             }
 
-            // in this example, we support two tenants: contoso and adventureworks
+            // in this example, we support two tenants: contoso and northwind
             // in a production use case, the list of tenants would be retrieved from a database and each request / user tenant would be deducted from an authentication token
-            List<string> tenantIdentifiers = ["contoso", "adventureworks"];
+            List<string> tenantIdentifiers = ["contoso", "northwind"];
             
             var serverBrokerService = new EventHubsServerBrokerService(checkpointBlobContainerUrl, eventHubsNamespaceFqdn, azureTokenCredential, tenantIdentifiers);
             CancellationTokenSource cancellationTokenSource = new();

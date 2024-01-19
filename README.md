@@ -45,11 +45,11 @@ Then, run the following commands to run the client application:
    1. Run `cd src/NimbusBridge.Client`
    1. Run `dotnet run`
 
-At startup, the NimbusBridge client will ask you to enter the name of the tenant you want to simulate. Accepted values are `contoso` and `adventureworks`. If you enter any other value, the client will default to `contoso`.
+At startup, the NimbusBridge client will ask you to enter the name of the tenant you want to simulate. Accepted values are `contoso` and `northwind`. If you enter any other value, the client will default to `contoso`.
 
 #### Call the Nimbus Bridge API
 
-Now that both API and client are running, you can call the API to check that everything works correctly. The endpoint of the API is available at the end of the output of the `azd up` command. The only implemented API is `/weatherforecast?tenantId=<TENANT_ID>`, where `<TENANT_ID>` is either `contoso` or `adventureworks`, depending on what you have chosen when running the client application.
+Now that both API and client are running, you can call the API to check that everything works correctly. The endpoint of the API is available at the end of the output of the `azd up` command. The only implemented API is `/weatherforecast?tenantId=<TENANT_ID>`, where `<TENANT_ID>` is either `contoso` or `northwind`, depending on what you have chosen when running the client application.
 
 #### Clean up
 

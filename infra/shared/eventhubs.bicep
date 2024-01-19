@@ -16,8 +16,8 @@ resource eventHubsNamespace 'Microsoft.EventHub/namespaces@2021-11-01' = {
   }
 }
 
-resource adventureWorksCommandsEventHub 'Microsoft.EventHub/namespaces/eventhubs@2021-11-01' = {
-  name: 'adventureworks-commands'
+resource northwindCommandsEventHub 'Microsoft.EventHub/namespaces/eventhubs@2021-11-01' = {
+  name: 'northwind-commands'
   parent: eventHubsNamespace
   properties: {
     messageRetentionInDays: 1
@@ -64,9 +64,9 @@ resource contosoCommandsEventHubListenConnectionString 'Microsoft.EventHub/names
   }
 }
 
-resource adventureWorksCommandsEventHubListenConnectionString 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2021-11-01' = {
-  parent: adventureWorksCommandsEventHub
-  name: 'AdventureWorksListenCommandsHub'
+resource northwindCommandsEventHubListenConnectionString 'Microsoft.EventHub/namespaces/eventhubs/authorizationRules@2021-11-01' = {
+  parent: northwindCommandsEventHub
+  name: 'NorthwindListenCommandsHub'
   properties: {
     rights: [
       'Listen'
@@ -115,7 +115,7 @@ resource checkpointBlobContainer 'Microsoft.Storage/storageAccounts/blobServices
 }
 
 var contosoCommandsEventHubListenConnectionStringValue = listKeys(contosoCommandsEventHubListenConnectionString.id, contosoCommandsEventHubListenConnectionString.apiVersion).primaryConnectionString
-var adventureWorksCommandsEventHubListenConnectionStringValue = listKeys(adventureWorksCommandsEventHubListenConnectionString.id, adventureWorksCommandsEventHubListenConnectionString.apiVersion).primaryConnectionString
+var northwindCommandsEventHubListenConnectionStringValue = listKeys(northwindCommandsEventHubListenConnectionString.id, northwindCommandsEventHubListenConnectionString.apiVersion).primaryConnectionString
 var responsesEventHubSendConnectionStringValue = listKeys(responsesEventHubSendConnectionString.id, responsesEventHubSendConnectionString.apiVersion).primaryConnectionString
 
 resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
@@ -130,11 +130,11 @@ resource contosoCommandsListenConnectionStringSecret 'Microsoft.KeyVault/vaults/
   }
 }
 
-resource adventureWorksCommandsListenConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
+resource northwindCommandsListenConnectionStringSecret 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = {
   parent: keyVault
-  name: 'AdventureWorksCommandsEventHubListenConnectionString'
+  name: 'NorthwindCommandsEventHubListenConnectionString'
   properties: {
-    value: adventureWorksCommandsEventHubListenConnectionStringValue
+    value: northwindCommandsEventHubListenConnectionStringValue
   }
 }
 

@@ -35,10 +35,10 @@ internal class Program
             cts.Cancel();
         };
 
-        Console.WriteLine("Please enter the name of the tenant to simulate (contoso or adventureworks)");
+        Console.WriteLine("Please enter the name of the tenant to simulate (contoso or northwind)");
         string tenantName = Console.ReadLine() ?? string.Empty;
 
-        if(tenantName != "contoso" && tenantName != "adventureworks")
+        if(tenantName != "contoso" && tenantName != "northwind")
         {
             tenantName = "contoso";
             Console.WriteLine("The tenant name is invalid. The tenant name has been set to contoso.");
