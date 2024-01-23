@@ -1,0 +1,32 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "environmentName": {
+        "value": "${AZURE_ENV_NAME}"
+      },
+      "location": {
+        "value": "${AZURE_LOCATION}"
+      },
+      "nimbusBridgeApiExists": {
+        "value": "${SERVICE_NIMBUSBRIDGEAPI_RESOURCE_EXISTS=false}"
+      },
+      "nimbusBridgeApiDefinition": {
+        "value": {
+          "settings": [
+            {
+              "name": "AZURE_KEY_VAULT_ENDPOINT",
+              "value": "${AZURE_KEY_VAULT_ENDPOINT}"
+            },
+            {
+              "name": "NIMBUS_BRIDGE_USER_ASSIGNED_IDENTITY_ID",
+              "value": "${NIMBUS_BRIDGE_USER_ASSIGNED_IDENTITY_ID}"
+            }
+          ]
+        }
+      },
+      "principalId": {
+        "value": "${AZURE_PRINCIPAL_ID}"
+      }
+    }
+}
