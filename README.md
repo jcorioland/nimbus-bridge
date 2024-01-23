@@ -35,6 +35,33 @@ Then, run the following commands to get the project on your local environment:
 > **Note**<br>
 > If you want to deploy only the infrastructure and not deploy the application, run `azd provision` instead of `azd up`.
 
+#### Infrastucture
+
+These are the main resources that are created when running the `azd up` command:
+
+- A resource group
+- An Azure Key Vault
+- An Azure EventHubs namespace
+- An Azure Storage account
+- An Azure Container Registry
+- An App Container Environment and App Container Service
+- An Azure AppInsights instance
+
+![Infrastructure](./assets/img/infrastructure.png)
+
+#### Projects structure
+
+This sample is composed by the following projects:
+
+- [NimbusBridge.Core](./src/NimbusBridge.Core) - Contains the core logic of the NimbusBridge architecture, interfaces of the different services and the models (commands and responses) used by API and client.
+- [NimbusBridge.Azure.EventHubs](./src/NimbusBridge.Azure.EventHubs) - Contains the implementation of the NimbusBridge services using Azure EventHubs. These implementations are used by the API and the client.
+- [NimbusBridgeApi](./src/NimbusBridgeApi) - Contains the API that exposes the NimbusBridge services in the Cloud.
+- [NimbusBridge.Client](./src/NimbusBridge.Client) - Contains the client application that runs on premises and calls the legacy software.
+- [NimbusBridge.LegacySdk](./src/NimbusBridge.LegacySdk) - Contains the SDK that simulates the legacy software.
+
+> **Note**<br>
+> If you are using Visual Studio 2022, you can open the [src/NimbusBridge.sln](./src/NimbusBridge.sln) solution file to open all the projects at once.
+
 #### Run the NimbusBridge client application
 
 Before running the NimbusBridge client application you need to update the [appsettings.json](./src/NimbusBridge.Client/appsettings.json) file with the following values:
