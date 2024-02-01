@@ -1,6 +1,6 @@
 # NimbusBridge: Seamless integration of your legacy software with Azure Cloud
 
-NimbusBridge is an architectural guidance that aim to simplify the integration of legacy software with the Azure Cloud. You can read more about this architecture guidance in this [blog post](TODO ISE DevBlog URL). 
+NimbusBridge is a fictional use case that provides guidance to simplify the integration of legacy software with Azure Cloud and platform such as Microsoft Teams by providing seamless integration between Cloud API and legacy software running in corporate networks, through modern brokers (aka Azure Event Hubs, Azure Service Bus, Kafka etc.), without network peering or VPN. It allows building reliable, scalable, and secure multi-tenants API in the Cloud that can interact with a variety of legacy software running on-premises. 
 This repository contains a reference implementation of the NimbusBridge architecture, using C# and .NET 8.
 
 It simulates the following architecture / flow:
