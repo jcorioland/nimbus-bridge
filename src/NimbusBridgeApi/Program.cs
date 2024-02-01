@@ -76,7 +76,7 @@ namespace NimbusBridgeApi
 
             app.UseAuthorization();
 
-            app.MapGet("/weatherforecast", async (HttpContext httpContext, IServerBrokerService<EventHubsBrokerCommand> serverBrokerService) =>
+            app.MapGet("/customers", async (HttpContext httpContext, IServerBrokerService<EventHubsBrokerCommand> serverBrokerService) =>
             {
                 string tenantId = httpContext.Request.Query["tenantId"].ToString();
                 if(string.IsNullOrEmpty(tenantId))
@@ -84,10 +84,10 @@ namespace NimbusBridgeApi
                     throw new HttpRequestException(message: "No tenantId parameter found.", inner: null, statusCode: System.Net.HttpStatusCode.BadRequest);
                 }
 
-                var command = new EventHubsBrokerCommand(tenantId, "GetWeatherForecast");
-                return await serverBrokerService.SendCommandAsync<GetWeatherForecastResponse>(command, httpContext.RequestAborted);
+                var command = new EventHubsBrokerCommand(tenantId, "GetCustomers");
+                return await serverBrokerService.SendCommandAsync<GetCustomersResponse>(command, httpContext.RequestAborted);
             })
-            .WithName("GetWeatherForecast")
+            .WithName("GetCustomers")
             .WithOpenApi();
 
             app.Run();

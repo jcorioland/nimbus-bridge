@@ -23,14 +23,15 @@ internal class Program
         }
 
         string? eventHubsNamespaceFqdn = configuration["NIMBUS_BRIDGE_EVENTHUBS_NAMESPACE_FQDN"];
-        if(string.IsNullOrEmpty(eventHubsNamespaceFqdn))
+        if (string.IsNullOrEmpty(eventHubsNamespaceFqdn))
         {
             throw new InvalidOperationException("The configuration setting variable NIMBUS_BRIDGE_EVENTHUBS_NAMESPACE_FQDN must be set.");
         }
 
         var cts = new CancellationTokenSource();
 
-        Console.CancelKeyPress += (_, e) => {
+        Console.CancelKeyPress += (_, e) =>
+        {
             e.Cancel = true;
             cts.Cancel();
         };
@@ -38,7 +39,7 @@ internal class Program
         Console.WriteLine("Please enter the name of the tenant to simulate (contoso or northwind)");
         string tenantName = Console.ReadLine() ?? string.Empty;
 
-        if(tenantName != "contoso" && tenantName != "northwind")
+        if (tenantName != "contoso" && tenantName != "northwind")
         {
             tenantName = "contoso";
             Console.WriteLine("The tenant name is invalid. The tenant name has been set to contoso.");
@@ -52,27 +53,30 @@ internal class Program
     private static async Task OnCommandReceivedAsync(EventHubsBrokerCommand command)
     {
         Console.WriteLine("New command received.");
-        if(clientBrokerService == null)
+        if (clientBrokerService == null)
         {
             throw new InvalidOperationException("The client broker service is not initialized.");
         }
 
-        if (command.CommandName == "GetWeatherForecast")
+        if (command.CommandName == "GetCustomers")
         {
-            Console.WriteLine("Sending response to command GetWeatherForecast.");
-            
+            Console.WriteLine("Sending response to command GetCustomers.");
+
             // here we are running on the NimbusBridge client side, i.e. on premise.
-            // this client is able to use a legacy SDK to retrieve the weather forecast from the NimbusBridge legacy software service.
+            // this client is able to use a legacy SDK to retrieve the list of customers the NimbusBridge legacy software service.
             // we can imagine various scenarios where the legacy software service uses different transports or protocols, like http, RPC, inter-process communication, etc.
-            var weatherForecastLegacyService = new NimbusBridge.LegacySdk.WeatherForecastService();
-            var weatherForecast = weatherForecastLegacyService.GetWeatherForecast(DateOnly.FromDateTime(DateTime.UtcNow));
-            var response = new GetWeatherForecastResponse(command.CorrelationId, command.TenantId)
-            {
-                Date = weatherForecast.Date,
-                TemperatureC = weatherForecast.TemperatureC,
-                TemperatureF = weatherForecast.TemperatureF,
-                Summary = weatherForecast.Summary
-            };
+            var customersLegacyService = new NimbusBridge.LegacySdk.CustomersService();
+            var customers = customersLegacyService.GetCustomers();
+            var response = new GetCustomersResponse(command.CorrelationId, command.TenantId);
+            response.Customers.AddRange(
+                customers.Select(
+                    c => new Customer(
+                        c.CustomerId,
+                        c.FirstName,
+                        c.LastName,
+                        c.City,
+                        c.Country)
+                    ));
 
             await semaphoreSlim.WaitAsync();
             try
