@@ -2,7 +2,7 @@
 
 namespace NimbusBridge.Core.Models;
 
-[JsonDerivedType(typeof(GetWeatherForecastResponse))]
+[JsonDerivedType(typeof(GetCustomersResponse))]
 public abstract class BrokerResponseBase : BrokerCommandResponseBase
 {
     public BrokerResponseBase()

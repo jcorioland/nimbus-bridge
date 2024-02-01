@@ -170,7 +170,7 @@ public class EventHubsServerBrokerService : IServerBrokerService<EventHubsBroker
             // deserialize the response
             // in the case of the sample, we only support the GetWeatherForecastResponse but it might be extended to more strongly typed responses
             var jsonResponse = Encoding.UTF8.GetString(args.Data.Body.ToArray());
-            var brokeredResponse = JsonSerializer.Deserialize<GetWeatherForecastResponse>(jsonResponse);
+            var brokeredResponse = JsonSerializer.Deserialize<GetCustomersResponse>(jsonResponse);
 
             if (brokeredResponse == null)
             {
